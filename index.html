@@ -96,18 +96,56 @@
     .btn-secondary:hover { background: #45475a; }
 
     /* ── Config Panel ────────────────────────────────────── */
-    .config-panel {
+    /* Config modal backdrop */
+    .config-backdrop {
       display: none;
-      background: #181825;
-      border-bottom: 1px solid #313244;
-      padding: 10px 18px;
-      gap: 10px;
-      align-items: flex-start;
-      flex-shrink: 0;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
     }
-    .config-panel.open { display: flex; }
+    .config-backdrop.open { display: flex; }
+
+    /* Config popup panel */
+    .config-panel {
+      background: #181825;
+      border: 1px solid #45475a;
+      border-radius: 8px;
+      padding: 16px;
+      width: 420px;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .config-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cba6f7;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .config-close-btn {
+      background: none;
+      border: none;
+      color: #6c7086;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .config-close-btn:hover { color: #cdd6f4; }
     .config-panel textarea {
-      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
       background: #1e1e2e;
       color: #cdd6f4;
       border: 1px solid #313244;
@@ -117,14 +155,13 @@
       font-size: 11px;
       line-height: 1.5;
       resize: vertical;
-      min-height: 80px;
-      max-height: 160px;
+      min-height: 180px;
       outline: none;
     }
     .config-panel textarea:focus { border-color: #cba6f7; }
     .config-panel .config-actions {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       gap: 6px;
     }
     .config-error {
@@ -399,13 +436,19 @@
   <button class="btn" onclick="window.print()">Print / Save PDF</button>
 </div>
 
-<div class="config-panel" id="config-panel">
-  <textarea id="config-editor" spellcheck="false"></textarea>
-  <div class="config-actions">
-    <button class="btn btn-secondary" onclick="applyConfigFromEditor()">Apply</button>
-    <button class="btn btn-secondary" onclick="copyConfig()">Copy</button>
+<div class="config-backdrop" id="config-backdrop" onclick="handleBackdropClick(event)">
+  <div class="config-panel" id="config-panel">
+    <div class="config-panel-header">
+      <span>Config JSON</span>
+      <button class="config-close-btn" onclick="toggleConfig()">✕</button>
+    </div>
+    <textarea id="config-editor" spellcheck="false"></textarea>
+    <div class="config-actions">
+      <button class="btn btn-secondary" onclick="applyConfigFromEditor()">Apply</button>
+      <button class="btn btn-secondary" onclick="copyConfig()">Copy</button>
+    </div>
+    <div id="config-error" class="config-error"></div>
   </div>
-  <div id="config-error" class="config-error"></div>
 </div>
 
 <div class="main">
@@ -566,6 +609,7 @@ function applyStyles() {
 [fontSelect, bulletSelect].forEach(s => s.addEventListener('change', () => { applyStyles(); syncConfigEditor(); }));
 
 // ── Config panel ──────────────────────────────────────────────────────────────
+const configBackdrop = document.getElementById('config-backdrop');
 const configPanel  = document.getElementById('config-panel');
 const configEditor = document.getElementById('config-editor');
 const configError  = document.getElementById('config-error');
@@ -584,7 +628,7 @@ function getConfig() {
 }
 
 function syncConfigEditor() {
-  if (configPanel.classList.contains('open')) {
+  if (configBackdrop.classList.contains('open')) {
     configEditor.value = JSON.stringify(getConfig(), null, 2);
     configError.textContent = '';
   }
@@ -617,9 +661,13 @@ function copyConfig() {
 }
 
 function toggleConfig() {
-  const open = configPanel.classList.toggle('open');
+  const open = configBackdrop.classList.toggle('open');
   document.getElementById('config-toggle-btn').textContent = open ? 'Config ▴' : 'Config ▾';
   if (open) syncConfigEditor();
+}
+
+function handleBackdropClick(e) {
+  if (e.target === configBackdrop) toggleConfig();
 }
 
 // ── Init ────────────────────────────────────────────────────────────────────
