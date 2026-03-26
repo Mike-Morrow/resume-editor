@@ -170,6 +170,74 @@
       margin-top: 4px;
     }
 
+    /* ── Help Panel ──────────────────────────────────────── */
+    .help-panel {
+      background: #181825;
+      border: 1px solid #45475a;
+      border-radius: 8px;
+      padding: 20px 22px;
+      width: 520px;
+      max-height: 78vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .help-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cba6f7;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .help-section h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #cba6f7;
+      margin-bottom: 6px;
+    }
+    .help-section p, .help-section li {
+      font-size: 12px;
+      line-height: 1.55;
+      color: #cdd6f4;
+    }
+    .help-section ul {
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .help-section code {
+      background: #313244;
+      color: #a6e3a1;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+    }
+    .help-section pre {
+      background: #1e1e2e;
+      border: 1px solid #313244;
+      border-radius: 5px;
+      padding: 10px 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #cdd6f4;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .help-divider {
+      border: none;
+      border-top: 1px solid #313244;
+    }
+
     /* ── Main Layout ─────────────────────────────────────── */
     .main {
       display: flex;
@@ -432,6 +500,7 @@
   </div>
 
   <div class="spacer"></div>
+  <button class="btn btn-secondary" onclick="toggleHelp()">?</button>
   <button class="btn btn-secondary" id="config-toggle-btn" onclick="toggleConfig()">Config ▾</button>
   <button class="btn" onclick="window.print()">Print / Save PDF</button>
 </div>
@@ -448,6 +517,76 @@
       <button class="btn btn-secondary" onclick="copyConfig()">Copy</button>
     </div>
     <div id="config-error" class="config-error"></div>
+  </div>
+</div>
+
+<div class="config-backdrop" id="help-backdrop" onclick="if(event.target===this)toggleHelp()">
+  <div class="help-panel">
+    <div class="help-panel-header">
+      <span>Formatting Guide</span>
+      <button class="config-close-btn" onclick="toggleHelp()">✕</button>
+    </div>
+
+    <div class="help-section">
+      <h3>Structure — 5 Building Blocks</h3>
+      <ul>
+        <li><code># Your Name</code> — your name (h1, large centered)</li>
+        <li><code>&gt; contact line</code> — contact info line (blockquote, centered below name)</li>
+        <li><code>## SECTION TITLE</code> — section header (e.g. WORK EXPERIENCE, EDUCATION)</li>
+        <li><code>### Company Name || City, State</code> — company row, bold left / location right</li>
+        <li><code>**Job Title** || Month Year – Present</code> — role row, italic left / date right</li>
+      </ul>
+    </div>
+
+    <hr class="help-divider">
+
+    <div class="help-section">
+      <h3>Lines: Solid vs Dotted</h3>
+      <ul>
+        <li><strong>Solid line</strong> — appears automatically before a new <code>### Company</code> that follows a bullet list (between companies)</li>
+        <li><strong>Dotted line</strong> — appears automatically before a <code>**Role**</code> that follows a bullet list (between roles at the same company)</li>
+        <li>These are CSS-driven — you don't add them manually</li>
+      </ul>
+    </div>
+
+    <hr class="help-divider">
+
+    <div class="help-section">
+      <h3>The <code>---</code> Rule</h3>
+      <ul>
+        <li>Only use <code>---</code> before <code>## SECTION</code> headers (after your contact info, between major sections)</li>
+        <li><strong>Never</strong> use <code>---</code> between roles at the same company — it creates a solid line and can trigger a heading bug</li>
+        <li>To separate sub-roles, just leave a blank line; the dotted line appears automatically</li>
+      </ul>
+    </div>
+
+    <hr class="help-divider">
+
+    <div class="help-section">
+      <h3>Blank Lines Matter</h3>
+      <ul>
+        <li>Always leave a blank line between a role/company line and the bullet list below it</li>
+        <li>Always leave a blank line between the last bullet and the next role/company</li>
+        <li>Missing blank lines can cause bullets to merge into headings</li>
+      </ul>
+    </div>
+
+    <hr class="help-divider">
+
+    <div class="help-section">
+      <h3>Quick Reference — One Company Block</h3>
+      <pre>### Company Name || City, State
+**First Role** || Jan 2022 – Present
+
+- Accomplishment one.
+- Accomplishment two.
+
+**Earlier Role** || Jun 2020 – Dec 2021
+
+- Accomplishment one.
+- Accomplishment two.</pre>
+      <p style="margin-top:6px;font-size:11px;color:#6c7086;">The dotted line before "Earlier Role" appears automatically — no <code>---</code> needed.</p>
+    </div>
   </div>
 </div>
 
@@ -668,6 +807,10 @@ function toggleConfig() {
 
 function handleBackdropClick(e) {
   if (e.target === configBackdrop) toggleConfig();
+}
+
+function toggleHelp() {
+  document.getElementById('help-backdrop').classList.toggle('open');
 }
 
 // ── Init ────────────────────────────────────────────────────────────────────
